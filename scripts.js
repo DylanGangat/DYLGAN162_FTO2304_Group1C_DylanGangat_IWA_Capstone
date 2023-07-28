@@ -1,5 +1,5 @@
 import { BOOKS_PER_PAGE, authors, genres, books, html } from "./data.js";
-// Usesthe length ofthe books object through the code
+// Uses the length ofthe books object through the code
 const matches = books;
 let page = 1;
 
@@ -48,7 +48,7 @@ const createPreview = book => {
   return element;
 };
 
-const updateRemaining = () => {
+const updateRemainingButton = () => {
   html.list.button.innerText = `Show more (${books.length - BOOKS_PER_PAGE})`;
 
   // If the [page * BOOKS_PER_PAGE] is greater than the matches.length then you would want to disable the list button
@@ -84,12 +84,13 @@ const createPreviewsFragment = (matches, startIndex = 0, endIndex = 36) => {
     const preview = createPreview(book);
     fragment.appendChild(preview);
   }
-  updateRemaining();
+  updateRemainingButton();
 
   return fragment;
 };
 
 html.list.items.appendChild(createPreviewsFragment(matches));
+// html.list.button.innerText = `Show more (${books.length - BOOKS_PER_PAGE})`;
 
 /**
  * Creates an HTML document fragment containing genre options.
@@ -197,7 +198,7 @@ html.list.close.addEventListener("click", () => {
 // changes page variable to plus 1
 // should update button with total amount of books left
 //   html.list.items.appendChild(createPreviewsFragment(matches, `${page} x ${BOOKS_PER_PAGE}`, `${page + 1} x ${BOOKS_PER_PAGE}`))
-// actions.list.updateRemaining()
+// actions.list.updateRemainingButton()
 //     page = page + 1
 // }
 // when you click the button it appends new book buttons to the bottem of the page
@@ -206,7 +207,7 @@ html.list.close.addEventListener("click", () => {
 html.list.button.addEventListener("click", () => {
   page = page + 1;
   html.list.items.appendChild(createPreviewsFragment(matches, page * BOOKS_PER_PAGE, (page + 1) * BOOKS_PER_PAGE));
-  // updateRemaining();
+  // updateRemainingButton();
 });
 
 // data-search-form.click(filters) {
