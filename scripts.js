@@ -18,8 +18,6 @@ const css = {
   },
 };
 
-/* ========================================== BOOKS CREATION ========================================= */
-
 /**
  * Creates a book preview as a button element with the provided book information.
  * @param {Object} book - The book object containing details of the book.
@@ -48,21 +46,25 @@ const createPreview = book => {
   return element;
 };
 
-const updateRemainingButton = () => {
-  html.list.button.innerText = `Show more (${books.length - BOOKS_PER_PAGE})`;
+/**
+ * Updates the "Show more" button with the correct text and state based on the current page and book data.
+ * The function calculates the number of remaining books based on the current page and books per page,
+ * and then updates the button's text content and disabled state accordingly.
+ *
+ */
 
-  // If the [page * BOOKS_PER_PAGE] is greater than the matches.length then you would want to disable the list button
-  html.list.button.disabled = !(matches.length - page * BOOKS_PER_PAGE > 0);
+const updateRemainingButton = () => {
+  const remainingBooksCount = matches.length - page * BOOKS_PER_PAGE;
+  const remainingBooksDisplay = remainingBooksCount > 0 ? remainingBooksCount : 0;
+  // Set the text content of the button to display the total number of books and "Show more".
+  html.list.button.innerText = `Show more (${books.length - BOOKS_PER_PAGE})`;
+  // Disable the button if there are no remaining books to show.
+  html.list.button.disabled = !(remainingBooksCount > 0);
   html.list.button.innerHTML = /* html */ `
   <span>Show more</span>
-  <span class="list__remaining"> (${matches.length - page * BOOKS_PER_PAGE > 0 ? matches.length - page * BOOKS_PER_PAGE : 0})</span>
+  <span class="list__remaining"> (${remainingBooksDisplay})</span>
 `;
 };
-
-// will probably have to create a dynamic function in order to use the page count  and change the slice value base on the changing
-// page count like for reference at line: 174
-// matches.slice(page x BOOKS_PER_PAGE, {page + 1} x BOOKS_PER_PAGE) // books.slice(0, 36)
-// createPreviewsFragment(matches, page x BOOKS_PER_PAGE, {page + 1} x BOOKS_PER_PAGE])
 
 // const fragment = document.createDocumentFragment();
 // const extractedBooks = books.slice(0, 36);
@@ -74,11 +76,20 @@ const updateRemainingButton = () => {
 
 // html.list.items.appendChild(fragment);
 
+
+/**
+ * Creates a document fragment containing previews of books from the given matches array.
+ *
+ * @param {Array} matches - The array containing book data.
+ * @param {number} [startIndex=0] - The index to start extracting books from the matches array.
+ * @param {number} [endIndex=36] - The index to end extracting books from the matches array.
+ * @returns {DocumentFragment} The document fragment containing book previews.
+ */
 const createPreviewsFragment = (matches, startIndex = 0, endIndex = 36) => {
   const fragment = document.createDocumentFragment();
-  // console.log(startIndex, endIndex);
+
   const extractedBooks = matches.slice(startIndex, endIndex);
-  // console.log(extractedBooks);
+
   //  Loops through the extractedBooks Array and creates a list of book previews and appends them to the HTML document.
   for (const book of extractedBooks) {
     const preview = createPreview(book);
