@@ -76,7 +76,6 @@ const updateRemainingButton = () => {
 
 // html.list.items.appendChild(fragment);
 
-
 /**
  * Creates a document fragment containing previews of books from the given matches array.
  *
@@ -101,7 +100,6 @@ const createPreviewsFragment = (matches, startIndex = 0, endIndex = 36) => {
 };
 
 html.list.items.appendChild(createPreviewsFragment(matches));
-// html.list.button.innerText = `Show more (${books.length - BOOKS_PER_PAGE})`;
 
 /**
  * Creates an HTML document fragment containing genre options.
@@ -139,11 +137,11 @@ const createGenreOptionsHtml = () => {
 
 html.search.genres.appendChild(createGenreOptionsHtml());
 
-/**s a default "All Authors" option
- * and additional author options based on the provided authors obj
- * Creates an HTML document fragment containing author options.
+/**
+ * Creates a document fragment containing HTML options for a list of authors.
  *
- * This function generates an HTML document fragment that includeect.
+ * * This function generates an HTML document fragment that includes a default "All Authors" option
+ * and additional author options based on the provided authors object.
  *
  * @returns {DocumentFragment} The HTML document fragment with author options.
  */
@@ -200,88 +198,83 @@ html.list.close.addEventListener("click", () => {
   html.list.overlay.removeAttribute("open");
 });
 
-// matches, page x BOOKS_PER_PAGE, {page + 1} x BOOKS_PER_PAGE
-
-// matches.slice(page x BOOKS_PER_PAGE, {page + 1} x BOOKS_PER_PAGE) // books.slice(0, 36)
-
-// data-list-button.click() {
-// when you click the button it appends new book buttons to the bottem of the page
-// changes page variable to plus 1
-// should update button with total amount of books left
-//   html.list.items.appendChild(createPreviewsFragment(matches, `${page} x ${BOOKS_PER_PAGE}`, `${page + 1} x ${BOOKS_PER_PAGE}`))
-// actions.list.updateRemainingButton()
-//     page = page + 1
-// }
-// when you click the button it appends new book buttons to the bottem of the page
-// changes page variable to plus 1
-// should update button with total amount of books left
+/**
+ * Event listener for the "click" event on the list button.
+ * Increases the current page number, appends new book previews to the list, and updates the "Show more" button.
+ *
+ * @listens click
+ */
 html.list.button.addEventListener("click", () => {
   page = page + 1;
   html.list.items.appendChild(createPreviewsFragment(matches, page * BOOKS_PER_PAGE, (page + 1) * BOOKS_PER_PAGE));
-  // updateRemainingButton();
 });
 
-// data-search-form.click(filters) {
-//     preventDefault()
-//     const formData = new FormData(event.target)
-//     const filters = Object.fromEntries(formData)
-//     result = []
+/**
+ * Filter for submitting the form data and showing the book previews in the html
+ */
+// html.search.form.addEventListener("click", event => {
+//   event.preventDefault();
+//   const formData = new FormData(event.target);
+//   const filters = Object.fromEntries(formData);
+//   console.log("filters: ", formData, filters);
+//   const result = [];
 
-//     for (book; booksList; i++) {
-//         titleMatch = filters.title.trim() = '' && book.title.toLowerCase().includes[filters.title.toLowerCase()]
-//         authorMatch = filters.author = 'any' || book.author === filters.author
+//   // for (book; booksList; i++) {
+//   //     titleMatch = filters.title.trim() = '' && book.title.toLowerCase().includes[filters.title.toLowerCase()]
+//   //     authorMatch = filters.author = 'any' || book.author === filters.author
 
-//         {
-//             genreMatch = filters.genre = 'any'
-//             for (genre; book.genres; i++) { if singleGenre = filters.genre { genreMatch === true }}}
-//         }
+//   //     {
+//   //         genreMatch = filters.genre = 'any'
+//   //         for (genre; book.genres; i++) { if singleGenre = filters.genre { genreMatch === true }}}
+//   //     }
 
-//         if titleMatch && authorMatch && genreMatch => result.push(book)
-//     }
+//   //     if titleMatch && authorMatch && genreMatch => result.push(book)
+//   // }
 
-//     if display.length < 1
-//     data-list-message.class.add('list__message_show')
-//     else data-list-message.class.remove('list__message_show')
+//   // if display.length < 1
+//   // data-list-message.class.add('list__message_show')
+//   // else data-list-message.class.remove('list__message_show')
 
-//     data-list-items.innerHTML = ''
-//     // const fragment = document.createDocumentFragment()
-//     // const extractedBooks = source.slice(range[0], range[1])
+//   // data-list-items.innerHTML = ''
 
-//     // for ({ author, image, title, id }; extractedBooks; i++) {
-//     //     const { author: authorId, id, image, title } = props
+//   // const fragment = document.createDocumentFragment()
+//   // const extractedBooks = source.slice(range[0], range[1])
 
-//     //     element = document.createElement('button')
-//     //     element.classList = 'preview'
-//     //     element.setAttribute('data-preview', id)
+//   // for ({ author, image, title, id }; extractedBooks; i++) {
+//   //     const { author: authorId, id, image, title } = props
 
-//     //     element.innerHTML = /* html */ `
-//     //         <img
-//     //             class="preview__image"
-//     //             src="${image}"
-//     //         />
+//   //     element = document.createElement('button')
+//   //     element.classList = 'preview'
+//   //     element.setAttribute('data-preview', id)
 
-//     //         <div class="preview__info">
-//     //             <h3 class="preview__title">${title}</h3>
-//     //             <div class="preview__author">${authors[authorId]}</div>
-//     //         </div>
-//     //     `
+//   //     element.innerHTML = /* html */ `
+//   //         <img
+//   //             class="preview__image"
+//   //             src="${image}"
+//   //         />
 
-//     //     fragment.appendChild(element)
-//     // }
+//   //         <div class="preview__info">
+//   //             <h3 class="preview__title">${title}</h3>
+//   //             <div class="preview__author">${authors[authorId]}</div>
+//   //         </div>
+//   //     `
 
-//     // data-list-items.appendChild(fragments)
-//     initial === matches.length - [page * BOOKS_PER_PAGE]
-//     remaining === hasRemaining ? initial : 0
-//     data-list-button.disabled = initial > 0
+//   //     fragment.appendChild(element)
+//   // }
 
-//     data-list-button.innerHTML = /* html */ `
-//         <span>Show more</span>
-//         <span class="list__remaining"> (${remaining})</span>
-//     `
+//   // data-list-items.appendChild(fragments)
+//   // initial === matches.length - [page * BOOKS_PER_PAGE]
+//   // remaining === hasRemaining ? initial : 0
+//   // data-list-button.disabled = initial > 0
 
-//     window.scrollTo({ top: 0, behavior: 'smooth' });
-//     data-search-overlay.open = false
-// }
+//   // data-list-button.innerHTML = /* html */ `
+//   //     <span>Show more</span>
+//   //     <span class="list__remaining"> (${remaining})</span>
+//   // `
+
+//   // window.scrollTo({ top: 0, behavior: 'smooth' });
+//   // data-search-overlay.open = false
+// });
 
 // data-settings-overlay.submit; {
 //     preventDefault()
@@ -292,28 +285,31 @@ html.list.button.addEventListener("click", () => {
 //     data-settings-overlay).open === false
 // }
 
-// data-list-items.click() {
-//     pathArray = Array.from(event.path || event.composedPath())
-//     active;
+/**
+ * Shows book preview info
+ */
+data-list-items.click() {
+    pathArray = Array.from(event.path || event.composedPath())
+    active;
 
-//     for (node; pathArray; i++) {
-//         if active break;
-//         const previewId = node?.dataset?.preview
+    for (node; pathArray; i++) {
+        if active break;
+        const previewId = node?.dataset?.preview
 
-//         for (const singleBook of books) {
-//             if (singleBook.id === id) active = singleBook
-//         }
-//     }
+        for (const singleBook of books) {
+            if (singleBook.id === id) active = singleBook
+        }
+    }
 
-//     if !active return
-//     data-list-active.open === true
-//     data-list-blur + data-list-image === active.image
-//     data-list-title === active.title
+    if !active return
+    data-list-active.open === true
+    data-list-blur + data-list-image === active.image
+    data-list-title === active.title
 
-//     data-list-subtitle === '${authors[active.author]} (${Date(active.published).year})'
-//     data-list-description === active.description
+    data-list-subtitle === '${authors[active.author]} (${Date(active.published).year})'
+    data-list-description === active.description
 
-// }
+}
 
 // Open search menu
 html.search.button.addEventListener("click", event => {
