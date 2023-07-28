@@ -1,2 +1,11 @@
-# Owner-avatar-DYLGAN162_FTO2304_Group1C_DylanGangat_IWA_Capstone
+# IWA Capstone
+
+**Author:** Dylan Gangat 🙋‍♂️
+
 Final Capstone Project where we create a Book Connect App.
+
+## Technologies Used 👨‍💻
+
+- HTML
+- CSS
+- JavaScript
