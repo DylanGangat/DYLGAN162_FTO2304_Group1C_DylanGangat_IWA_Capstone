@@ -19,6 +19,26 @@ const css = {
 };
 
 /**
+ * Detects if the user prefers dark mode and applies corresponding theme styles to the HTML document.
+ * @function applyDarkModeTheme
+ */
+const applyDarkModeTheme = () => {
+  /**
+   * Indicates whether the user prefers dark mode.
+   * @type {boolean}
+   */
+  const prefersDarkMode = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  html.settings.theme.value = prefersDarkMode ? "night" : "day";
+  const theme = prefersDarkMode ? "night" : "day";
+
+  // Update CSS variables based on user theme preference
+  document.documentElement.style.setProperty("--color-dark", css[theme].dark);
+  document.documentElement.style.setProperty("--color-light", css[theme].light);
+};
+
+applyDarkModeTheme();
+
+/**
  * Creates a book preview as a button element with the provided book information.
  * @param {Object} book - The book object containing details of the book.
  * @param {string} book.author - The ID of the book's author.
@@ -65,16 +85,6 @@ const updateRemainingButton = () => {
   <span class="list__remaining"> (${remainingBooksDisplay})</span>
 `;
 };
-
-// const fragment = document.createDocumentFragment();
-// const extractedBooks = books.slice(0, 36);
-// //  Loops through the extractedBooks Array and creates a list of book previews and appends them to the HTML document.
-// for (const book of extractedBooks) {
-//   const preview = createPreview(book);
-//   fragment.appendChild(preview);
-// }
-
-// html.list.items.appendChild(fragment);
 
 /**
  * Creates a document fragment containing previews of books from the given matches array.
@@ -171,39 +181,6 @@ const createAuthorOptionsHtml = () => {
 };
 
 html.search.authors.appendChild(createAuthorOptionsHtml());
-
-// /* ========================================== DARK + LIGHT MODE THEME START ========================================= */
-// // Dark + Light Theme mode
-// // Putting it all together, the code checks if the user's device or browser environment supports dark mode. If the user prefers dark mode, the expression will evaluate to true. If the user doesn't prefer dark mode or their device/browser doesn't support the window.matchMedia method, the expression will evaluate to false.
-// data-settings-theme.value === window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day'
-// v = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches? 'night' | 'day'
-
-// document.documentElement.style.setProperty('--color-dark', css[v].dark);
-// document.documentElement.style.setProperty('--color-light', css[v].light);
-
-// /* ========================================== MORE BUTTON WITH DYNAMIC BOOKS NUMBER ========================================== */
-
-// /* ==========================================  EVENT LISTENERS ========================================== */
-
-/**
- * Theme mode
- */
-// data-settings-overlay.submit; {
-//     preventDefault()
-//     const formData = new FormData(event.target)
-//     const result = Object.fromEntries(formData)
-//     document.documentElement.style.setProperty('--color-dark', css[result.theme].dark);
-//     document.documentElement.style.setProperty('--color-light', css[result.theme].light);
-//     data-settings-overlay).open === false
-// }
-
-// Dark theme settings where you sumbit data
-// data-settings-form.submit() { actions.settings.submit }
-html.settings.form.addEventListener("submit", event => {
-  event.preventDefault();
-  const { value } = html.settings.theme;
-  //   html.other["theme"] = value;
-});
 
 /**
  * Filter for submitting the form data and showing the book previews in the html
@@ -359,6 +336,29 @@ const handleListItemClick = event => {
   html.list.overlay.open = true;
 };
 
+/**
+ * Update the dark/light mode based on user preferences submitted through the form.
+ * @param {Event} event - The form submission event object.
+ */
+const updateDarkLightMode = event => {
+  event.preventDefault();
+  /**
+   * Represents form data containing user preferences.
+   * @type {FormData}
+   */
+  const formData = new FormData(event.target);
+  /**
+   * Represents the theme preference selected by the user.
+   * @type {string}
+   */
+  const { theme } = Object.fromEntries(formData);
+
+  // Update CSS variables based on user theme preference
+  document.documentElement.style.setProperty("--color-dark", css[theme].dark);
+  document.documentElement.style.setProperty("--color-light", css[theme].light);
+  html.settings.overlay.open = false;
+};
+
 // Open search menu
 html.search.button.addEventListener("click", handleSearchButtonClick);
 // Close search menu
@@ -374,3 +374,5 @@ html.list.close.addEventListener("click", handleBookPreviewCloseClick);
 html.list.button.addEventListener("click", handleListButtonClick);
 
 html.list.items.addEventListener("click", handleListItemClick);
+
+html.settings.form.addEventListener("submit", updateDarkLightMode);
