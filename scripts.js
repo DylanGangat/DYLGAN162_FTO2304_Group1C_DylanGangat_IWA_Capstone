@@ -185,28 +185,24 @@ html.search.authors.appendChild(createAuthorOptionsHtml());
 
 // /* ==========================================  EVENT LISTENERS ========================================== */
 
+/**
+ * Theme mode
+ */
+// data-settings-overlay.submit; {
+//     preventDefault()
+//     const formData = new FormData(event.target)
+//     const result = Object.fromEntries(formData)
+//     document.documentElement.style.setProperty('--color-dark', css[result.theme].dark);
+//     document.documentElement.style.setProperty('--color-light', css[result.theme].light);
+//     data-settings-overlay).open === false
+// }
+
 // Dark theme settings where you sumbit data
 // data-settings-form.submit() { actions.settings.submit }
 html.settings.form.addEventListener("submit", event => {
   event.preventDefault();
   const { value } = html.settings.theme;
   //   html.other["theme"] = value;
-});
-
-// close book preview overlay
-html.list.close.addEventListener("click", () => {
-  html.list.overlay.open = false;
-});
-
-/**
- * Event listener for the "click" event on the list button.
- * Increases the current page number, appends new book previews to the list, and updates the "Show more" button.
- *
- * @listens click
- */
-html.list.button.addEventListener("click", () => {
-  page = page + 1;
-  html.list.items.appendChild(createPreviewsFragment(matches, page * BOOKS_PER_PAGE, (page + 1) * BOOKS_PER_PAGE));
 });
 
 /**
@@ -219,74 +215,62 @@ html.list.button.addEventListener("click", () => {
 //   console.log("filters: ", formData, filters);
 //   const result = [];
 
-//   // for (book; booksList; i++) {
-//   //     titleMatch = filters.title.trim() = '' && book.title.toLowerCase().includes[filters.title.toLowerCase()]
-//   //     authorMatch = filters.author = 'any' || book.author === filters.author
+// for (book; booksList; i++) {
+//     titleMatch = filters.title.trim() = '' && book.title.toLowerCase().includes[filters.title.toLowerCase()]
+//     authorMatch = filters.author = 'any' || book.author === filters.author
 
-//   //     {
-//   //         genreMatch = filters.genre = 'any'
-//   //         for (genre; book.genres; i++) { if singleGenre = filters.genre { genreMatch === true }}}
-//   //     }
+//     {
+//         genreMatch = filters.genre = 'any'
+//         for (genre; book.genres; i++) { if singleGenre = filters.genre { genreMatch === true }}}
+//     }
 
-//   //     if titleMatch && authorMatch && genreMatch => result.push(book)
-//   // }
-
-//   // if display.length < 1
-//   // data-list-message.class.add('list__message_show')
-//   // else data-list-message.class.remove('list__message_show')
-
-//   // data-list-items.innerHTML = ''
-
-//   // const fragment = document.createDocumentFragment()
-//   // const extractedBooks = source.slice(range[0], range[1])
-
-//   // for ({ author, image, title, id }; extractedBooks; i++) {
-//   //     const { author: authorId, id, image, title } = props
-
-//   //     element = document.createElement('button')
-//   //     element.classList = 'preview'
-//   //     element.setAttribute('data-preview', id)
-
-//   //     element.innerHTML = /* html */ `
-//   //         <img
-//   //             class="preview__image"
-//   //             src="${image}"
-//   //         />
-
-//   //         <div class="preview__info">
-//   //             <h3 class="preview__title">${title}</h3>
-//   //             <div class="preview__author">${authors[authorId]}</div>
-//   //         </div>
-//   //     `
-
-//   //     fragment.appendChild(element)
-//   // }
-
-//   // data-list-items.appendChild(fragments)
-//   // initial === matches.length - [page * BOOKS_PER_PAGE]
-//   // remaining === hasRemaining ? initial : 0
-//   // data-list-button.disabled = initial > 0
-
-//   // data-list-button.innerHTML = /* html */ `
-//   //     <span>Show more</span>
-//   //     <span class="list__remaining"> (${remaining})</span>
-//   // `
-
-//   // window.scrollTo({ top: 0, behavior: 'smooth' });
-//   // data-search-overlay.open = false
-// });
-
-/**
- * Theme mode
- */
-// data-settings-overlay.submit; {
-//     preventDefault()
-//     const formData = new FormData(event.target)
-//     const result = Object.fromEntries(formData)
-//     document.documentElement.style.setProperty('--color-dark', css[result.theme].dark);
-//     document.documentElement.style.setProperty('--color-light', css[result.theme].light);
-//     data-settings-overlay).open === false
+//     if titleMatch && authorMatch && genreMatch => result.push(book)
 // }
+
+// if display.length < 1
+// data-list-message.class.add('list__message_show')
+// else data-list-message.class.remove('list__message_show')
+
+// data-list-items.innerHTML = ''
+
+// const fragment = document.createDocumentFragment()
+// const extractedBooks = source.slice(range[0], range[1])
+
+// for ({ author, image, title, id }; extractedBooks; i++) {
+//     const { author: authorId, id, image, title } = props
+
+//     element = document.createElement('button')
+//     element.classList = 'preview'
+//     element.setAttribute('data-preview', id)
+
+//     element.innerHTML = /* html */ `
+//         <img
+//             class="preview__image"
+//             src="${image}"
+//         />
+
+//         <div class="preview__info">
+//             <h3 class="preview__title">${title}</h3>
+//             <div class="preview__author">${authors[authorId]}</div>
+//         </div>
+//     `
+
+//     fragment.appendChild(element)
+// }
+
+// data-list-items.appendChild(fragments)
+// initial === matches.length - [page * BOOKS_PER_PAGE]
+// remaining === hasRemaining ? initial : 0
+// data-list-button.disabled = initial > 0
+
+// data-list-button.innerHTML = /* html */ `
+//     <span>Show more</span>
+//     <span class="list__remaining"> (${remaining})</span>
+// `
+
+// window.scrollTo({ top: 0, behavior: 'smooth' });
+// data-search-overlay.open = false
+// });
 
 // Function to handle the search button click event and open the search overlay
 const handleSearchButtonClick = event => {
@@ -308,6 +292,19 @@ const handleSettingsButtonClick = event => {
 // Function to handle the settings cancel button click event and close the settings overlay
 const handleSettingsCancelClick = event => {
   html.settings.overlay.open = false;
+};
+
+const handleBookPreviewCloseClick = () => {
+  html.list.overlay.open = false;
+};
+
+/**
+ * Event handler for the "click" event on the list button.
+ * Increases the current page number, appends new book previews to the list, and updates the "Show more" button.
+ */
+const handleListButtonClick = () => {
+  page = page + 1;
+  html.list.items.appendChild(createPreviewsFragment(matches, page * BOOKS_PER_PAGE, (page + 1) * BOOKS_PER_PAGE));
 };
 
 /**
@@ -370,5 +367,10 @@ html.search.cancel.addEventListener("click", handleSearchCancelClick);
 html.settings.button.addEventListener("click", handleSettingsButtonClick);
 // Close settings menu
 html.settings.cancel.addEventListener("click", handleSettingsCancelClick);
+
+// close book preview overlay
+html.list.close.addEventListener("click", handleBookPreviewCloseClick);
+
+html.list.button.addEventListener("click", handleListButtonClick);
 
 html.list.items.addEventListener("click", handleListItemClick);
