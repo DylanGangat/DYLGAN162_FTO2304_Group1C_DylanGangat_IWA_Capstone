@@ -288,12 +288,32 @@ html.list.button.addEventListener("click", () => {
 //     data-settings-overlay).open === false
 // }
 
+// Function to handle the search button click event and open the search overlay
+const handleSearchButtonClick = event => {
+  html.search.overlay.open = true;
+  html.search.title.focus();
+};
+
+// Function to handle the search cancel button click event and close the search overlay
+const handleSearchCancelClick = event => {
+  html.search.overlay.open = false;
+  html.search.form.reset();
+};
+
+// Function to handle the settings button click event and open the settings overlay
+const handleSettingsButtonClick = event => {
+  html.settings.overlay.open = true;
+};
+
+// Function to handle the settings cancel button click event and close the settings overlay
+const handleSettingsCancelClick = event => {
+  html.settings.overlay.open = false;
+};
+
 /**
- * Event listener function to handle click events on list items and displays book preview overlay.
- *
- * @param {Event} event - The click event object.
+ * Populates an HTML overlay with book details when a list item representing a book is clicked.
  */
-html.list.items.addEventListener("click", event => {
+const handleListItemClick = event => {
   // Array of all the elements nodes the event.target will bubble up from.
   const pathArray = Array.from(event.path || event.composedPath());
   /**
@@ -303,7 +323,7 @@ html.list.items.addEventListener("click", event => {
   let active;
 
   /**
-   * Loop through the DOM elements in the path to find the book with matching ID.
+   * Loop through the DOM elements in the pathArray to find the book with matching ID.
    */
   for (const node of pathArray) {
     if (active) break;
@@ -340,28 +360,6 @@ html.list.items.addEventListener("click", event => {
   html.list.description.innerText = description;
 
   html.list.overlay.open = true;
-});
-
-// Function to handle the search button click event and open the search overlay
-const handleSearchButtonClick = event => {
-  html.search.overlay.open = true;
-  html.search.title.focus();
-};
-
-// Function to handle the search cancel button click event and close the search overlay
-const handleSearchCancelClick = event => {
-  html.search.overlay.open = false;
-  html.search.form.reset();
-};
-
-// Function to handle the settings button click event and open the settings overlay
-const handleSettingsButtonClick = event => {
-  html.settings.overlay.open = true;
-};
-
-// Function to handle the settings cancel button click event and close the settings overlay
-const handleSettingsCancelClick = event => {
-  html.settings.overlay.open = false;
 };
 
 // Open search menu
@@ -372,3 +370,5 @@ html.search.cancel.addEventListener("click", handleSearchCancelClick);
 html.settings.button.addEventListener("click", handleSettingsButtonClick);
 // Close settings menu
 html.settings.cancel.addEventListener("click", handleSettingsCancelClick);
+
+html.list.items.addEventListener("click", handleListItemClick);
