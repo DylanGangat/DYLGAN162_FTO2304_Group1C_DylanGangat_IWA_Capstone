@@ -31,7 +31,7 @@ const createPreview = book => {
   const { author: authorId, id, image, title } = book;
   const element = document.createElement("button");
   element.className = "preview";
-  element.setAttribute("data-preview", id);
+  element.dataset.preview = id;
   element.innerHTML = /* html */ `
               <img
                   class="preview__image"
@@ -193,9 +193,9 @@ html.settings.form.addEventListener("submit", event => {
   //   html.other["theme"] = value;
 });
 
-// show book event where you close it
+// close book preview overlay
 html.list.close.addEventListener("click", () => {
-  html.list.overlay.removeAttribute("open");
+  html.list.overlay.open = false;
 });
 
 /**
@@ -276,6 +276,9 @@ html.list.button.addEventListener("click", () => {
 //   // data-search-overlay.open = false
 // });
 
+/**
+ * Theme mode
+ */
 // data-settings-overlay.submit; {
 //     preventDefault()
 //     const formData = new FormData(event.target)
@@ -286,47 +289,86 @@ html.list.button.addEventListener("click", () => {
 // }
 
 /**
- * Shows book preview info
+ * Event listener function to handle click events on list items and displays book preview overlay.
+ *
+ * @param {Event} event - The click event object.
  */
-data-list-items.click() {
-    pathArray = Array.from(event.path || event.composedPath())
-    active;
+html.list.items.addEventListener("click", event => {
+  // Array of all the elements nodes the event.target will bubble up from.
+  const pathArray = Array.from(event.path || event.composedPath());
+  /**
+   * Stores the active book object.
+   * @type {Object|null}
+   */
+  let active;
 
-    for (node; pathArray; i++) {
-        if active break;
-        const previewId = node?.dataset?.preview
+  /**
+   * Loop through the DOM elements in the path to find the book with matching ID.
+   */
+  for (const node of pathArray) {
+    if (active) break;
 
-        for (const singleBook of books) {
-            if (singleBook.id === id) active = singleBook
-        }
+    /**
+     * Extract the previewId from the element's dataset.
+     * @type {string|undefined}
+     */
+    const previewId = node?.dataset?.preview;
+
+    /**
+     * If no previewId is found, skip to the next element in the pathArray.
+     */
+    if (!previewId) continue;
+    /**
+     * Search for the book with matching id in the "books" array and asssign active = book.
+     */
+    for (const singleBook of books) {
+      if (singleBook.id === previewId) {
+        active = singleBook;
+        break;
+      }
     }
+  }
 
-    if !active return
-    data-list-active.open === true
-    data-list-blur + data-list-image === active.image
-    data-list-title === active.title
+  if (!active) return;
 
-    data-list-subtitle === '${authors[active.author]} (${Date(active.published).year})'
-    data-list-description === active.description
+  const { image, title, author, published, description } = active;
 
-}
+  html.list.blur.src = image;
+  html.list.image.src = image;
+  html.list.title.innerText = title;
+  html.list.subtitle.innerText = `${authors[author]} (${new Date(published).getFullYear()})`;
+  html.list.description.innerText = description;
+
+  html.list.overlay.open = true;
+});
+
+// Function to handle the search button click event and open the search overlay
+const handleSearchButtonClick = event => {
+  html.search.overlay.open = true;
+  html.search.title.focus();
+};
+
+// Function to handle the search cancel button click event and close the search overlay
+const handleSearchCancelClick = event => {
+  html.search.overlay.open = false;
+  html.search.form.reset();
+};
+
+// Function to handle the settings button click event and open the settings overlay
+const handleSettingsButtonClick = event => {
+  html.settings.overlay.open = true;
+};
+
+// Function to handle the settings cancel button click event and close the settings overlay
+const handleSettingsCancelClick = event => {
+  html.settings.overlay.open = false;
+};
 
 // Open search menu
-html.search.button.addEventListener("click", event => {
-  html.search.overlay.setAttribute("open", "");
-  html.search.title.focus();
-});
+html.search.button.addEventListener("click", handleSearchButtonClick);
 // Close search menu
-html.search.cancel.addEventListener("click", event => {
-  html.search.overlay.removeAttribute("open");
-  html.search.form.reset();
-});
-
+html.search.cancel.addEventListener("click", handleSearchCancelClick);
 // Open settings menu
-html.settings.button.addEventListener("click", event => {
-  html.settings.overlay.setAttribute("open", "");
-});
+html.settings.button.addEventListener("click", handleSettingsButtonClick);
 // Close settings menu
-html.settings.cancel.addEventListener("click", event => {
-  html.settings.overlay.removeAttribute("open");
-});
+html.settings.cancel.addEventListener("click", handleSettingsCancelClick);
