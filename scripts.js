@@ -1,10 +1,11 @@
 import { BOOKS_PER_PAGE, authors, genres, books, html } from "./data.js";
-// Uses the length ofthe books object through the code
+
 const matches = books;
 let page = 1;
+const range = [0, books.length];
 
-// if (!books && !Array.isArray(books)) throw new Error("Source required");
-// if (!range && range.length < 2) throw new Error("Range must be an array with two numbers");
+if (!books && !Array.isArray(books)) throw new Error("Source required");
+if (!range && range.length < 2) throw new Error("Range must be an array with two numbers");
 
 const css = {
   day: {
@@ -185,69 +186,73 @@ html.search.authors.appendChild(createAuthorOptionsHtml());
 /**
  * Filter for submitting the form data and showing the book previews in the html
  */
-// html.search.form.addEventListener("click", event => {
-//   event.preventDefault();
-//   const formData = new FormData(event.target);
-//   const filters = Object.fromEntries(formData);
-//   console.log("filters: ", formData, filters);
-//   const result = [];
+html.search.form.addEventListener("submit", event => {
+  event.preventDefault();
+  const formData = new FormData(event.target);
+  const filters = Object.fromEntries(formData);
+  const result = [];
+  console.log("filters: ", filters, "result before: ", result);
 
-// for (book; booksList; i++) {
-//     titleMatch = filters.title.trim() = '' && book.title.toLowerCase().includes[filters.title.toLowerCase()]
-//     authorMatch = filters.author = 'any' || book.author === filters.author
+  for (const singleBook of books) {
+    // if (singleBook.title !== filters.title) continue;
+    console.log("singleBook", singleBook);
+    const filtersTitle = filters.title.trim();
+    const titleMatch = filtersTitle && singleBook.title.toLowerCase().includes(filtersTitle.toLowerCase());
+    const authorMatch = filters.author === "any" || singleBook.author === filters.author;
 
-//     {
-//         genreMatch = filters.genre = 'any'
-//         for (genre; book.genres; i++) { if singleGenre = filters.genre { genreMatch === true }}}
-//     }
+    const genreMatch = filters.genre === "any" || singleBook.genres.includes(filters.genre);
+    console.log("filtersTitle: ", filters.title, "titleMatch: ", titleMatch, "authorMatch: ", authorMatch, "genreMatch: ", genreMatch);
 
-//     if titleMatch && authorMatch && genreMatch => result.push(book)
-// }
+    if (titleMatch && authorMatch && genreMatch) result.push(singleBook);
+    console.log("result after: ", result);
+    // REMOVE WHEN DONE
+    if (titleMatch) break;
+  }
 
-// if display.length < 1
-// data-list-message.class.add('list__message_show')
-// else data-list-message.class.remove('list__message_show')
+  // if display.length < 1
+  // data-list-message.class.add('list__message_show')
+  // else data-list-message.class.remove('list__message_show')
 
-// data-list-items.innerHTML = ''
+  // data-list-items.innerHTML = ''
 
-// const fragment = document.createDocumentFragment()
-// const extractedBooks = source.slice(range[0], range[1])
+  // const fragment = document.createDocumentFragment()
+  // const extractedBooks = books.slice(range[0], range[1])
 
-// for ({ author, image, title, id }; extractedBooks; i++) {
-//     const { author: authorId, id, image, title } = props
+  // for ({ author, image, title, id }; extractedBooks; i++) {
+  //     const { author: authorId, id, image, title } = props
 
-//     element = document.createElement('button')
-//     element.classList = 'preview'
-//     element.setAttribute('data-preview', id)
+  //     element = document.createElement('button')
+  //     element.classList = 'preview'
+  //     element.setAttribute('data-preview', id)
 
-//     element.innerHTML = /* html */ `
-//         <img
-//             class="preview__image"
-//             src="${image}"
-//         />
+  //     element.innerHTML = /* html */ `
+  //         <img
+  //             class="preview__image"
+  //             src="${image}"
+  //         />
 
-//         <div class="preview__info">
-//             <h3 class="preview__title">${title}</h3>
-//             <div class="preview__author">${authors[authorId]}</div>
-//         </div>
-//     `
+  //         <div class="preview__info">
+  //             <h3 class="preview__title">${title}</h3>
+  //             <div class="preview__author">${authors[authorId]}</div>
+  //         </div>
+  //     `
 
-//     fragment.appendChild(element)
-// }
+  //     fragment.appendChild(element)
+  // }
 
-// data-list-items.appendChild(fragments)
-// initial === matches.length - [page * BOOKS_PER_PAGE]
-// remaining === hasRemaining ? initial : 0
-// data-list-button.disabled = initial > 0
+  // data-list-items.appendChild(fragments)
+  // initial === matches.length - [page * BOOKS_PER_PAGE]
+  // remaining === hasRemaining ? initial : 0
+  // data-list-button.disabled = initial > 0
 
-// data-list-button.innerHTML = /* html */ `
-//     <span>Show more</span>
-//     <span class="list__remaining"> (${remaining})</span>
-// `
+  // data-list-button.innerHTML = /* html */ `
+  //     <span>Show more</span>
+  //     <span class="list__remaining"> (${remaining})</span>
+  // `
 
-// window.scrollTo({ top: 0, behavior: 'smooth' });
-// data-search-overlay.open = false
-// });
+  // window.scrollTo({ top: 0, behavior: 'smooth' });
+  // data-search-overlay.open = false
+});
 
 // Function to handle the search button click event and open the search overlay
 const handleSearchButtonClick = event => {
