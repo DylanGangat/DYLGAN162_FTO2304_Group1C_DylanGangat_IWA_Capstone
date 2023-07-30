@@ -1,5 +1,17 @@
 export const BOOKS_PER_PAGE = 36;
 
+export const css = {
+  day: {
+    dark: "10, 10, 20",
+    light: "255, 255, 255",
+  },
+
+  night: {
+    dark: "255, 255, 255",
+    light: "10, 10, 20",
+  },
+};
+
 export const authors = {
   "194e164b-9365-4358-b44a-f28a93cc528f": "Steven D. Levitt",
   "76e8065c-fd7a-4a8b-a8ea-6105a47d0781": "Stephen J. Dubner",
@@ -25446,40 +25458,3 @@ export const books = [
     author: "8e7083f4-7613-4872-a21b-62fbe33fe180",
   },
 ];
-
-export const html = {
-  list: {
-    button: document.querySelector("[data-list-button]"),
-    message: document.querySelector("[data-list-message]"),
-    overlay: document.querySelector("[data-list-active]"),
-    close: document.querySelector("[data-list-close]"),
-    items: document.querySelector("[data-list-items]"),
-    blur: document.querySelector("[data-list-blur]"),
-    image: document.querySelector("[data-list-image]"),
-    title: document.querySelector("[data-list-title]"),
-    subtitle: document.querySelector("[data-list-subtitle]"),
-    description: document.querySelector("[data-list-description]"),
-  },
-  search: {
-    button: document.querySelector("[data-header-search]"),
-    overlay: document.querySelector("[data-search-overlay]"),
-    cancel: document.querySelector("[data-search-cancel]"),
-    form: document.querySelector("[data-search-form]"),
-
-    authors: document.querySelector("[data-search-authors]"),
-    genres: document.querySelector("[data-search-genres]"),
-    title: document.querySelector("[data-search-title]"),
-  },
-  settings: {
-    button: document.querySelector("[data-header-settings]"),
-    overlay: document.querySelector("[data-settings-overlay]"),
-    cancel: document.querySelector("[data-settings-cancel]"),
-    form: document.querySelector("[data-settings-form]"),
-
-    theme: document.querySelector("[data-settings-theme]"),
-  },
-  other: {},
-  // authors: {},
-  // genres: {},
-  // books: {},
-};

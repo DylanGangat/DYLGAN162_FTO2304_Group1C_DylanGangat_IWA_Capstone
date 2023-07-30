@@ -1,4 +1,5 @@
-import { BOOKS_PER_PAGE, authors, genres, books, html } from "./data.js";
+import { BOOKS_PER_PAGE, css, books, authors } from "./data.js";
+import { html, createPreview } from "./view.js";
 
 let matches = books;
 let page = 1;
@@ -7,66 +8,6 @@ const range = [0, 36];
 
 if (!books && !Array.isArray(books)) throw new Error("Source required");
 if (!range && range.length < 2) throw new Error("Range must be an array with two numbers");
-
-const css = {
-  day: {
-    dark: "10, 10, 20",
-    light: "255, 255, 255",
-  },
-
-  night: {
-    dark: "255, 255, 255",
-    light: "10, 10, 20",
-  },
-};
-
-/**
- * Detects if the user prefers dark mode and applies corresponding theme styles to the HTML document.
- * @function applyDarkModeTheme
- */
-const applyDarkModeTheme = () => {
-  /**
-   * Indicates whether the user prefers dark mode.
-   * @type {boolean}
-   */
-  const prefersDarkMode = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  html.settings.theme.value = prefersDarkMode ? "night" : "day";
-  const theme = prefersDarkMode ? "night" : "day";
-
-  // Update CSS variables based on user theme preference
-  document.documentElement.style.setProperty("--color-dark", css[theme].dark);
-  document.documentElement.style.setProperty("--color-light", css[theme].light);
-};
-
-applyDarkModeTheme();
-
-/**
- * Creates a book preview as a button element with the provided book information.
- * @param {Object} book - The book object containing details of the book.
- * @param {string} book.author - The ID of the book's author.
- * @param {string} book.id - The unique ID of the book.
- * @param {string} book.image - The URL of the book's cover image.
- * @param {string} book.title - The title of the book.
- * @returns {HTMLButtonElement} The generated button element representing the book preview.
- */
-const createPreview = book => {
-  const { author: authorId, id, image, title } = book;
-  const element = document.createElement("button");
-  element.className = "preview";
-  element.dataset.preview = id;
-  element.innerHTML = /* html */ `
-              <img
-                  class="preview__image"
-                  src="${image}"
-              />
-
-              <div class="preview__info">
-                  <h3 class="preview__title">${title}</h3>
-                  <div class="preview__author">${authors[authorId]}</div>
-              </div>
-          `;
-  return element;
-};
 
 /**
  * Updates the "Show more" button with the correct text and state based on the current page and book data.
@@ -89,16 +30,18 @@ const updateRemainingButton = () => {
 };
 
 /**
- * Creates a document fragment containing previews of books from the given matches array.
+ * Creates a document fragment containing a list of book previews based on the provided matches array,
+ * starting from the specified startIndex up to the endIndex or until the end of the matches array.
  *
- * @param {Array} matches - The array containing book data.
- * @param {number} [startIndex=0] - The index to start extracting books from the matches array.
- * @param {number} [endIndex=36] - The index to end extracting books from the matches array.
- * @returns {DocumentFragment} The document fragment containing book previews.
+ * @param {Array} matches - The array of book objects to create previews from.
+ * @param {number} [startIndex=range[0]] - The index to start creating previews from. Default is the first index of the range array.
+ * @param {number} [endIndex=range[1]] - The index to stop creating previews at. Default is the second index of the range array.
+ * @returns {DocumentFragment} The document fragment containing the book previews.
  */
-const createPreviewsFragment = (matches, startIndex = 0, endIndex = 36) => {
+const createPreviewsFragment = (matches, startIndex = range[0], endIndex = range[1]) => {
   const fragment = document.createDocumentFragment();
-
+  // If startIndex can't add another 36 book preview the next time it's called,
+  // this ensures that the remaining book previews are added from the "matches" array.
   if (startIndex + 36 > matches.length) {
     startIndex -= 36;
     endIndex = matches.length;
@@ -119,144 +62,44 @@ const createPreviewsFragment = (matches, startIndex = 0, endIndex = 36) => {
 html.list.items.appendChild(createPreviewsFragment(matches));
 
 /**
- * Creates an HTML document fragment containing genre options.
- *
- * This function generates an HTML document fragment that includes a default "All Genres" option
- * and additional genre options based on the provided genres object.
- *
- * @returns {DocumentFragment} The HTML document fragment with genre options.
+ * Function to handle the search button click event and open the search overlay
  */
-
-const createGenreOptionsHtml = () => {
-  const fragment = document.createDocumentFragment();
-  /**
-   * Default "All Genres" option.
-   * @type {HTMLOptionElement}
-   */
-  const allGenresOption = document.createElement("option");
-  allGenresOption.value = "any";
-  allGenresOption.innerText = "All Genres";
-  fragment.appendChild(allGenresOption);
-
-  for (const [id, name] of Object.entries(genres)) {
-    /**
-     * Genre option element.
-     * @type {HTMLOptionElement}
-     */
-    const genreOption = document.createElement("option");
-    genreOption.value = id;
-    genreOption.innerText = name;
-    fragment.appendChild(genreOption);
-  }
-
-  return fragment;
-};
-
-html.search.genres.appendChild(createGenreOptionsHtml());
-
-/**
- * Creates a document fragment containing HTML options for a list of authors.
- *
- * * This function generates an HTML document fragment that includes a default "All Authors" option
- * and additional author options based on the provided authors object.
- *
- * @returns {DocumentFragment} The HTML document fragment with author options.
- */
-
-const createAuthorOptionsHtml = () => {
-  const fragment = document.createDocumentFragment();
-  /**
-   * Default "All Authors" option.
-   * @type {HTMLOptionElement}
-   */
-  const allAuthorsOption = document.createElement("option");
-  allAuthorsOption.value = "any";
-  allAuthorsOption.innerText = "All Authors";
-  fragment.appendChild(allAuthorsOption);
-
-  for (const [id, name] of Object.entries(authors)) {
-    /**
-     * Author option element.
-     * @type {HTMLOptionElement}
-     */
-    const authorOption = document.createElement("option");
-    authorOption.value = id;
-    authorOption.innerText = name;
-    fragment.appendChild(authorOption);
-  }
-  return fragment;
-};
-
-html.search.authors.appendChild(createAuthorOptionsHtml());
-
-/**
- * Filter for submitting the form data and showing the book previews in the html
- */
-html.search.form.addEventListener("submit", event => {
-  event.preventDefault();
-  const formData = new FormData(event.target);
-  const filters = Object.fromEntries(formData);
-  const result = [];
-  page = 1;
-
-  const filtersTitle = filters.title.trim().toLowerCase();
-  const filtersAuthor = filters.author;
-  const filtersGenre = filters.genre;
-
-  for (const singleBook of books) {
-    const titleMatch = filtersTitle === "" || singleBook.title.toLowerCase().includes(filtersTitle);
-    const authorMatch = filtersAuthor === "any" || singleBook.author === filtersAuthor;
-    const genreMatch = filtersGenre === "any" || singleBook.genres.includes(filtersGenre);
-
-    if (titleMatch && authorMatch && genreMatch) {
-      result.push(singleBook);
-    }
-  }
-
-  if (result.length < 1) {
-    html.list.message.classList.add("list__message_show");
-  } else {
-    html.list.message.classList.remove("list__message_show");
-  }
-
-  html.list.items.innerHTML = "";
-
-  matches = result;
-  html.list.items.appendChild(createPreviewsFragment(matches));
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  html.search.overlay.open = false;
-});
-
-// Function to handle the search button click event and open the search overlay
-const handleSearchButtonClick = event => {
+const handleSearchButtonClick = () => {
   html.search.overlay.open = true;
   html.search.title.focus();
 };
 
-// Function to handle the search cancel button click event and close the search overlay
-const handleSearchCancelClick = event => {
+/**
+ *  Function to handle the search cancel button click event and close the search overlay
+ */
+const handleSearchCancelClick = () => {
   html.search.overlay.open = false;
   html.search.form.reset();
 };
 
-// Function to handle the settings button click event and open the settings overlay
-const handleSettingsButtonClick = event => {
+/**
+ * Function to handle the settings button click event and open the settings overlay
+ */
+const handleSettingsButtonClick = () => {
   html.settings.overlay.open = true;
 };
 
-// Function to handle the settings cancel button click event and close the settings overlay
-const handleSettingsCancelClick = event => {
+/**
+ * Function to handle the settings cancel button click event and close the settings overlay
+ */
+const handleSettingsCancelClick = () => {
   html.settings.overlay.open = false;
 };
 
+/**
+ * Function to handle the list close button click event and close the book preview overlay
+ */
 const handleBookPreviewCloseClick = () => {
   html.list.overlay.open = false;
 };
 
 /**
- * Event handler for the "click" event on the list button.
- * Increases the current page number, appends new book previews to the list, and updates the "Show more" button.
+ * Function that increases the current page number, appends new book previews to the list, and updates the "Show more" button.
  */
 const handleListButtonClick = () => {
   page = page + 1;
@@ -317,7 +160,6 @@ const handleListItemClick = event => {
 
 /**
  * Update the dark/light mode based on user preferences submitted through the form.
- * @param {Event} event - The form submission event object.
  */
 const updateDarkLightMode = event => {
   event.preventDefault();
@@ -338,16 +180,53 @@ const updateDarkLightMode = event => {
   html.settings.overlay.open = false;
 };
 
-// Open search menu
+/**
+ * Filter function for submitting the form data and showing the book previews in the html
+ */
+const handleFilterFormSubmit = event => {
+  event.preventDefault();
+  const formData = new FormData(event.target);
+  const filters = Object.fromEntries(formData);
+  const result = [];
+  page = 1;
+
+  const filtersTitle = filters.title.trim().toLowerCase();
+  const filtersAuthor = filters.author;
+  const filtersGenre = filters.genre;
+
+  for (const singleBook of books) {
+    const titleMatch = filtersTitle === "" || singleBook.title.toLowerCase().includes(filtersTitle);
+    const authorMatch = filtersAuthor === "any" || singleBook.author === filtersAuthor;
+    const genreMatch = filtersGenre === "any" || singleBook.genres.includes(filtersGenre);
+
+    if (titleMatch && authorMatch && genreMatch) {
+      result.push(singleBook);
+    }
+  }
+
+  if (result.length < 1) {
+    html.list.message.classList.add("list__message_show");
+  } else {
+    html.list.message.classList.remove("list__message_show");
+  }
+
+  html.list.items.innerHTML = "";
+
+  matches = result;
+  html.list.items.appendChild(createPreviewsFragment(matches));
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  html.search.overlay.open = false;
+};
+
 html.search.button.addEventListener("click", handleSearchButtonClick);
-// Close search menu
+
 html.search.cancel.addEventListener("click", handleSearchCancelClick);
-// Open settings menu
+
 html.settings.button.addEventListener("click", handleSettingsButtonClick);
-// Close settings menu
+
 html.settings.cancel.addEventListener("click", handleSettingsCancelClick);
 
-// close book preview overlay
 html.list.close.addEventListener("click", handleBookPreviewCloseClick);
 
 html.list.button.addEventListener("click", handleListButtonClick);
@@ -355,3 +234,5 @@ html.list.button.addEventListener("click", handleListButtonClick);
 html.list.items.addEventListener("click", handleListItemClick);
 
 html.settings.form.addEventListener("submit", updateDarkLightMode);
+
+html.search.form.addEventListener("submit", handleFilterFormSubmit);
