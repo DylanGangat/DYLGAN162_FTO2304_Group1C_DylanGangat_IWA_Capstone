@@ -1,8 +1,9 @@
 import { BOOKS_PER_PAGE, authors, genres, books, html } from "./data.js";
 
-const matches = books;
+let matches = books;
 let page = 1;
-const range = [0, books.length];
+
+const range = [0, 36];
 
 if (!books && !Array.isArray(books)) throw new Error("Source required");
 if (!range && range.length < 2) throw new Error("Range must be an array with two numbers");
@@ -78,7 +79,7 @@ const updateRemainingButton = () => {
   const remainingBooksCount = matches.length - page * BOOKS_PER_PAGE;
   const remainingBooksDisplay = remainingBooksCount > 0 ? remainingBooksCount : 0;
   // Set the text content of the button to display the total number of books and "Show more".
-  html.list.button.innerText = `Show more (${books.length - BOOKS_PER_PAGE})`;
+  html.list.button.innerText = `Show more (${matches.length - BOOKS_PER_PAGE})`;
   // Disable the button if there are no remaining books to show.
   html.list.button.disabled = !(remainingBooksCount > 0);
   html.list.button.innerHTML = /* html */ `
@@ -97,6 +98,11 @@ const updateRemainingButton = () => {
  */
 const createPreviewsFragment = (matches, startIndex = 0, endIndex = 36) => {
   const fragment = document.createDocumentFragment();
+
+  if (startIndex + 36 > matches.length) {
+    startIndex -= 36;
+    endIndex = matches.length;
+  }
 
   const extractedBooks = matches.slice(startIndex, endIndex);
 
@@ -191,67 +197,35 @@ html.search.form.addEventListener("submit", event => {
   const formData = new FormData(event.target);
   const filters = Object.fromEntries(formData);
   const result = [];
-  console.log("filters: ", filters, "result before: ", result);
+  page = 1;
+
+  const filtersTitle = filters.title.trim().toLowerCase();
+  const filtersAuthor = filters.author;
+  const filtersGenre = filters.genre;
 
   for (const singleBook of books) {
-    // if (singleBook.title !== filters.title) continue;
-    console.log("singleBook", singleBook);
-    const filtersTitle = filters.title.trim();
-    const titleMatch = filtersTitle && singleBook.title.toLowerCase().includes(filtersTitle.toLowerCase());
-    const authorMatch = filters.author === "any" || singleBook.author === filters.author;
+    const titleMatch = filtersTitle === "" || singleBook.title.toLowerCase().includes(filtersTitle);
+    const authorMatch = filtersAuthor === "any" || singleBook.author === filtersAuthor;
+    const genreMatch = filtersGenre === "any" || singleBook.genres.includes(filtersGenre);
 
-    const genreMatch = filters.genre === "any" || singleBook.genres.includes(filters.genre);
-    console.log("filtersTitle: ", filters.title, "titleMatch: ", titleMatch, "authorMatch: ", authorMatch, "genreMatch: ", genreMatch);
-
-    if (titleMatch && authorMatch && genreMatch) result.push(singleBook);
-    console.log("result after: ", result);
-    // REMOVE WHEN DONE
-    if (titleMatch) break;
+    if (titleMatch && authorMatch && genreMatch) {
+      result.push(singleBook);
+    }
   }
 
-  // if display.length < 1
-  // data-list-message.class.add('list__message_show')
-  // else data-list-message.class.remove('list__message_show')
+  if (result.length < 1) {
+    html.list.message.classList.add("list__message_show");
+  } else {
+    html.list.message.classList.remove("list__message_show");
+  }
 
-  // data-list-items.innerHTML = ''
+  html.list.items.innerHTML = "";
 
-  // const fragment = document.createDocumentFragment()
-  // const extractedBooks = books.slice(range[0], range[1])
+  matches = result;
+  html.list.items.appendChild(createPreviewsFragment(matches));
 
-  // for ({ author, image, title, id }; extractedBooks; i++) {
-  //     const { author: authorId, id, image, title } = props
-
-  //     element = document.createElement('button')
-  //     element.classList = 'preview'
-  //     element.setAttribute('data-preview', id)
-
-  //     element.innerHTML = /* html */ `
-  //         <img
-  //             class="preview__image"
-  //             src="${image}"
-  //         />
-
-  //         <div class="preview__info">
-  //             <h3 class="preview__title">${title}</h3>
-  //             <div class="preview__author">${authors[authorId]}</div>
-  //         </div>
-  //     `
-
-  //     fragment.appendChild(element)
-  // }
-
-  // data-list-items.appendChild(fragments)
-  // initial === matches.length - [page * BOOKS_PER_PAGE]
-  // remaining === hasRemaining ? initial : 0
-  // data-list-button.disabled = initial > 0
-
-  // data-list-button.innerHTML = /* html */ `
-  //     <span>Show more</span>
-  //     <span class="list__remaining"> (${remaining})</span>
-  // `
-
-  // window.scrollTo({ top: 0, behavior: 'smooth' });
-  // data-search-overlay.open = false
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  html.search.overlay.open = false;
 });
 
 // Function to handle the search button click event and open the search overlay
