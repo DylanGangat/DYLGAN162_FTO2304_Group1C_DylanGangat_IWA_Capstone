@@ -40,20 +40,14 @@ const updateRemainingButton = () => {
 
 const createPreviewsFragment = (matches, startIndex = range[0], endIndex = range[1]) => {
   const fragment = document.createDocumentFragment();
-  // If startIndex can't add another 36 book preview the next time it's called,
-  // this ensures that the remaining book previews are added from the "matches" array.
-  if (startIndex + 36 > matches.length) {
-    startIndex -= 36;
-    endIndex = matches.length;
-  }
-
+  // Sliced books array provided by matches array
   const extractedBooks = matches.slice(startIndex, endIndex);
-
   //  Loops through the extractedBooks Array and creates a list of book previews and appends them to the HTML document.
   for (const book of extractedBooks) {
     const preview = createPreview(book);
     fragment.appendChild(preview);
   }
+  // Updates the remaining books number on button
   updateRemainingButton();
 
   return fragment;
@@ -102,8 +96,12 @@ const handleBookPreviewCloseClick = () => {
  * Function that increases the current page number, appends new book previews to the list, and updates the "Show more" button.
  */
 const handleListButtonClick = () => {
-  page = page + 1;
-  html.list.items.appendChild(createPreviewsFragment(matches, page * BOOKS_PER_PAGE, (page + 1) * BOOKS_PER_PAGE));
+  const nextPage = page + 1;
+  const startIndex = (page - 1) * BOOKS_PER_PAGE;
+  const endIndex = page * BOOKS_PER_PAGE;
+  page = nextPage;
+
+  html.list.items.appendChild(createPreviewsFragment(matches, startIndex, endIndex));
 };
 
 /**
