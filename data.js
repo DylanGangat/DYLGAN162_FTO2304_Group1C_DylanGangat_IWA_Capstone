@@ -1,5 +1,9 @@
 export const BOOKS_PER_PAGE = 36;
 
+/**
+ * The CSS colors used when someone changes between dark and light mode.
+ * @type {CssColors}
+ */
 export const css = {
   day: {
     dark: "10, 10, 20",

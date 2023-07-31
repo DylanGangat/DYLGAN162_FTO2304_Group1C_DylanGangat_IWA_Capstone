@@ -3,8 +3,7 @@ import { html, createPreview } from "./view.js";
 
 let matches = books;
 let page = 1;
-
-const range = [0, 36];
+const range = [0, BOOKS_PER_PAGE];
 
 if (!books && !Array.isArray(books)) throw new Error("Source required");
 if (!range && range.length < 2) throw new Error("Range must be an array with two numbers");
@@ -33,11 +32,12 @@ const updateRemainingButton = () => {
  * Creates a document fragment containing a list of book previews based on the provided matches array,
  * starting from the specified startIndex up to the endIndex or until the end of the matches array.
  *
- * @param {Array} matches - The array of book objects to create previews from.
- * @param {number} [startIndex=range[0]] - The index to start creating previews from. Default is the first index of the range array.
+ * @param {Array} matches - The array of book objects to create previews.
+ * @param {number} [startIndex=range[0]] - The index to start creating previews. Default is the first index of the range array.
  * @param {number} [endIndex=range[1]] - The index to stop creating previews at. Default is the second index of the range array.
  * @returns {DocumentFragment} The document fragment containing the book previews.
  */
+
 const createPreviewsFragment = (matches, startIndex = range[0], endIndex = range[1]) => {
   const fragment = document.createDocumentFragment();
   // If startIndex can't add another 36 book preview the next time it's called,
@@ -185,38 +185,51 @@ const updateDarkLightMode = event => {
  */
 const handleFilterFormSubmit = event => {
   event.preventDefault();
+  /** Extracts the form data from the submitted event.*/
   const formData = new FormData(event.target);
+  /** Converts the FormData object into a regular JavaScript object.*/
   const filters = Object.fromEntries(formData);
+  /** An array to store the filtered books. */
   const result = [];
+  // Resets the page to 1 after form submission.
   page = 1;
 
   const filtersTitle = filters.title.trim().toLowerCase();
   const filtersAuthor = filters.author;
   const filtersGenre = filters.genre;
 
+  // Loop through each book in the 'books' array to check for matches based on filters.
+  // Added a guard clause for best practice so that if the title, author, genre doesn't match, skip this book and continue with the next iteration.
   for (const singleBook of books) {
     const titleMatch = filtersTitle === "" || singleBook.title.toLowerCase().includes(filtersTitle);
+    if (!titleMatch) continue;
+
     const authorMatch = filtersAuthor === "any" || singleBook.author === filtersAuthor;
+    if (!authorMatch) continue;
+
     const genreMatch = filtersGenre === "any" || singleBook.genres.includes(filtersGenre);
+    if (!genreMatch) continue;
 
     if (titleMatch && authorMatch && genreMatch) {
       result.push(singleBook);
     }
   }
-
+  // Show or hide the message element depending on the number of filtered results.
   if (result.length < 1) {
     html.list.message.classList.add("list__message_show");
   } else {
     html.list.message.classList.remove("list__message_show");
   }
-
+  // Clear the current content in the list items container.
   html.list.items.innerHTML = "";
-
+  // Update the 'matches' variable with the filtered book array.
   matches = result;
+  // Append the newly filtered book previews to the list items container.
   html.list.items.appendChild(createPreviewsFragment(matches));
-
+  // Scrolls the page to the top (smooth scroll) after filtering.
   window.scrollTo({ top: 0, behavior: "smooth" });
   html.search.overlay.open = false;
+  html.search.form.reset();
 };
 
 html.search.button.addEventListener("click", handleSearchButtonClick);

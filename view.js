@@ -132,6 +132,7 @@ const createAuthorOptionsHtml = () => {
  * @param {string} book.title - The title of the book.
  * @returns {HTMLButtonElement} The generated button element representing the book preview.
  */
+
 export const createPreview = book => {
   const { author: authorId, id, image, title } = book;
   const element = document.createElement("button");
