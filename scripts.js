@@ -42,6 +42,7 @@ const createPreviewsFragment = (matches, startIndex = range[0], endIndex = range
   const fragment = document.createDocumentFragment();
   // Sliced books array provided by matches array
   const extractedBooks = matches.slice(startIndex, endIndex);
+  console.log(startIndex, endIndex, matches.length, page);
   //  Loops through the extractedBooks Array and creates a list of book previews and appends them to the HTML document.
   for (const book of extractedBooks) {
     const preview = createPreview(book);
@@ -97,9 +98,9 @@ const handleBookPreviewCloseClick = () => {
  */
 const handleListButtonClick = () => {
   const nextPage = page + 1;
+  page = nextPage;
   const startIndex = (page - 1) * BOOKS_PER_PAGE;
   const endIndex = page * BOOKS_PER_PAGE;
-  page = nextPage;
 
   html.list.items.appendChild(createPreviewsFragment(matches, startIndex, endIndex));
 };
