@@ -1,12 +1,12 @@
 import { BOOKS_PER_PAGE, css, books, authors } from "./data.js";
 import { html, createPreview } from "./view.js";
 
-let matches = books;
-let page = 1;
-const range = [0, BOOKS_PER_PAGE];
+let filteredBooks = books;
+let curentPage = 1;
+const previewRange = [0, BOOKS_PER_PAGE];
 
 if (!books && !Array.isArray(books)) throw new Error("Source required");
-if (!range && range.length < 2) throw new Error("Range must be an array with two numbers");
+if (!previewRange && previewRange.length < 2) throw new Error("previewRange must be an array with two numbers");
 
 /**
  * Updates the "Show more" button with the correct text and state based on the current page and book data.
@@ -16,10 +16,10 @@ if (!range && range.length < 2) throw new Error("Range must be an array with two
  */
 
 const updateRemainingButton = () => {
-  const remainingBooksCount = matches.length - page * BOOKS_PER_PAGE;
+  const remainingBooksCount = filteredBooks.length - curentPage * BOOKS_PER_PAGE;
   const remainingBooksDisplay = remainingBooksCount > 0 ? remainingBooksCount : 0;
   // Set the text content of the button to display the total number of books and "Show more".
-  html.list.button.innerText = `Show more (${matches.length - BOOKS_PER_PAGE})`;
+  html.list.button.innerText = `Show more (${filteredBooks.length - BOOKS_PER_PAGE})`;
   // Disable the button if there are no remaining books to show.
   html.list.button.disabled = !(remainingBooksCount > 0);
   html.list.button.innerHTML = /* html */ `
@@ -29,19 +29,19 @@ const updateRemainingButton = () => {
 };
 
 /**
- * Creates a document fragment containing a list of book previews based on the provided matches array,
- * starting from the specified startIndex up to the endIndex or until the end of the matches array.
+ * Creates a document fragment containing a list of book previews based on the provided filteredBooks array,
+ * starting from the specified startIndex up to the endIndex or until the end of the filteredBooks array.
  *
- * @param {Array} matches - The array of book objects to create previews.
- * @param {number} [startIndex=range[0]] - The index to start creating previews. Default is the first index of the range array.
- * @param {number} [endIndex=range[1]] - The index to stop creating previews at. Default is the second index of the range array.
+ * @param {Array} filteredBooks - The array of book objects to create previews.
+ * @param {number} [startIndex=previewRange[0]] - The index to start creating previews. Default is the first index of the previewRange array.
+ * @param {number} [endIndex=previewRange[1]] - The index to stop creating previews at. Default is the second index of the previewRange array.
  * @returns {DocumentFragment} The document fragment containing the book previews.
  */
 
-const createPreviewsFragment = (matches, startIndex = range[0], endIndex = range[1]) => {
+const createPreviewsFragment = (filteredBooks, startIndex = previewRange[0], endIndex = previewRange[1]) => {
   const fragment = document.createDocumentFragment();
-  // Sliced books array provided by matches array
-  const extractedBooks = matches.slice(startIndex, endIndex);
+  // Sliced books array provided by filteredBooks array
+  const extractedBooks = filteredBooks.slice(startIndex, endIndex);
   //  Loops through the extractedBooks Array and creates a list of book previews and appends them to the HTML document.
   for (const book of extractedBooks) {
     const preview = createPreview(book);
@@ -53,7 +53,7 @@ const createPreviewsFragment = (matches, startIndex = range[0], endIndex = range
   return fragment;
 };
 
-html.list.items.appendChild(createPreviewsFragment(matches));
+html.list.items.appendChild(createPreviewsFragment(filteredBooks));
 
 /**
  * Function to handle the search button click event and open the search overlay
@@ -96,12 +96,12 @@ const handleBookPreviewCloseClick = () => {
  * Function that increases the current page number, appends new book previews to the list, and updates the "Show more" button.
  */
 const handleListButtonClick = () => {
-  const nextPage = page + 1;
-  page = nextPage;
-  const startIndex = (page - 1) * BOOKS_PER_PAGE;
-  const endIndex = page * BOOKS_PER_PAGE;
+  const nextPage = curentPage + 1;
+  curentPage = nextPage;
+  const startIndex = (curentPage - 1) * BOOKS_PER_PAGE;
+  const endIndex = curentPage * BOOKS_PER_PAGE;
 
-  html.list.items.appendChild(createPreviewsFragment(matches, startIndex, endIndex));
+  html.list.items.appendChild(createPreviewsFragment(filteredBooks, startIndex, endIndex));
 };
 
 /**
@@ -111,16 +111,16 @@ const handleListItemClick = event => {
   // Array of all the elements nodes the event.target will bubble up from.
   const pathArray = Array.from(event.path || event.composedPath());
   /**
-   * Stores the active book object.
+   * Stores the clickedBook book object.
    * @type {Object|null}
    */
-  let active;
+  let clickedBook;
 
   /**
    * Loop through the DOM elements in the pathArray to find the book with matching ID.
    */
   for (const node of pathArray) {
-    if (active) break;
+    if (clickedBook) break;
 
     /**
      * Extract the previewId from the element's dataset.
@@ -133,19 +133,19 @@ const handleListItemClick = event => {
      */
     if (!previewId) continue;
     /**
-     * Search for the book with matching id in the "books" array and asssign active = book.
+     * Search for the book with matching id in the "books" array and asssign clickedBook = book.
      */
     for (const singleBook of books) {
       if (singleBook.id === previewId) {
-        active = singleBook;
+        clickedBook = singleBook;
         break;
       }
     }
   }
 
-  if (!active) return;
+  if (!clickedBook) return;
 
-  const { image, title, author, published, description } = active;
+  const { image, title, author, published, description } = clickedBook;
 
   html.list.blur.src = image;
   html.list.image.src = image;
@@ -189,14 +189,14 @@ const handleFilterFormSubmit = event => {
   const filters = Object.fromEntries(formData);
   /** An array to store the filtered books. */
   const result = [];
-  // Resets the page to 1 after form submission.
-  page = 1;
+  // Resets the curentPage to 1 after form submission.
+  curentPage = 1;
 
   const filtersTitle = filters.title.trim().toLowerCase();
   const filtersAuthor = filters.author;
   const filtersGenre = filters.genre;
 
-  // Loop through each book in the 'books' array to check for matches based on filters.
+  // Loop through each book in the 'books' array to check for filteredBooks based on filters.
   // Added a guard clause for best practice so that if the title, author, genre doesn't match, skip this book and continue with the next iteration.
   for (const singleBook of books) {
     const titleMatch = filtersTitle === "" || singleBook.title.toLowerCase().includes(filtersTitle);
@@ -213,18 +213,15 @@ const handleFilterFormSubmit = event => {
     }
   }
   // Show or hide the message element depending on the number of filtered results.
-  if (result.length < 1) {
-    html.list.message.classList.add("list__message_show");
-  } else {
-    html.list.message.classList.remove("list__message_show");
-  }
+  result.length < 1 ? html.list.message.classList.add("list__message_show") : html.list.message.classList.remove("list__message_show");
+
   // Clear the current content in the list items container.
   html.list.items.innerHTML = "";
-  // Update the 'matches' variable with the filtered book array.
-  matches = result;
+  // Update the 'filteredBooks' variable with the filtered book array.
+  filteredBooks = result;
   // Append the newly filtered book previews to the list items container.
-  html.list.items.appendChild(createPreviewsFragment(matches));
-  // Scrolls the page to the top (smooth scroll) after filtering.
+  html.list.items.appendChild(createPreviewsFragment(filteredBooks));
+  // Scrolls the curentPage to the top (smooth scroll) after filtering.
   window.scrollTo({ top: 0, behavior: "smooth" });
   html.search.overlay.open = false;
   html.search.form.reset();
